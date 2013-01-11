@@ -21,17 +21,22 @@
   <h1>jQuery Idle</h1>
   <p>This is a simple example that will print in the box below the user status (active or idle). In this example, after 5 seconds idle, it will be displayed... "Idle!", off course :)</p>
   <div id="status">Active!</div>
-  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-  <script type="text/javascript" src="jquery.idle.min.js"></script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+  <script type="text/javascript" src="jquery.idle.js"></script>
   <script type="text/javascript">
     $(document).idle({
+      onPreIdle: function(){
+      },
       onIdle: function(){
+        // console.log("idle");
         $('#status').toggleClass('idle').html('Idle!');
       },
       onActive: function(){
+        // console.log("active");
         $('#status').toggleClass('idle').html('Active!');
       },
-      idle: 5000
+      idle: 15000,
+      preIdle: 10000
     });
   </script>
 </body>

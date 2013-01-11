@@ -3,11 +3,11 @@
  *  Title:  JQuery Idle.
  *  A dead simple jQuery plugin that executes a callback function if the user is idle.
  *  About: Author
- *  Henrique Boaventura (hboaventura@gmail.com).
+ *  Rodney Carvalho forked from Henrique Boaventura (hboaventura@gmail.com).
  *  About: Version
- *  1.0.0
+ *  1.1.1
  *  About: License
- *  Copyright (C) 2012, Henrique Boaventura (hboaventura@gmail.com).
+ *  Copyright (C) 2013, Rodney Carvalho / Henrique Boaventura
  *  MIT License:
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  *  - The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
@@ -18,42 +18,53 @@
   $.fn.idle = function(options) {
 
     var defaults = {
+      preIdle: 30000,
       idle: 60000, //idle time in ms
-      events: 'mousemove keypress mousedown', //events that will trigger the idle resetter
+      events: 'keypress mousemove DOMMouseScroll mousewheel mousedown touchstart touchmove', //events that will trigger the idle resetter
+      onPreIdle: function(){}, //callback function to be executed after idle time
       onIdle: function(){}, //callback function to be executed after idle time
-      onActive: function(){}, //callback function to be executed after back from idleness
-      keepTracking: false //if you want to keep tracking user even after the first time, set this to true
+      onActive: function(){} //callback function to be executed after back from idleness
     };
 
-    var idle = false;
-
+    var idle = 0;
+    var ids = [];
     var settings = $.extend( {}, defaults, options );
 
-    var resetTimeout = function(id, settings){
-      if(idle){
-        settings.onActive.call();
-        idle = false;
+    var resetTimeout = function(settings){
+      while(id = ids.pop()){
+        // console.log("clearing " + id); 
+        clearTimeout(id);
       }
-      clearTimeout(id);
-
-      return timeout(settings);
+      if(idle > 0){
+        settings.onActive.call();
+      }
+      idle = 0;
+      timeout(settings);
     }
 
     var timeout = function(settings){
-      id = setTimeout(function(){
-        idle = true;
-        settings.onIdle.call();
-        if(settings.keepTracking){
-          timeout(settings);
+      id1 = setTimeout(function(){
+        if(idle < 1){
+          idle = 1;
+          settings.onPreIdle.call();
+        }
+      }, settings.preIdle);
+      // console.log("adding " + id1);
+      ids.push(id1);
+      id2 = setTimeout(function(){
+        if(idle == 1){
+          idle = 2;
+          settings.onIdle.call();
         }
       }, settings.idle);
-      return id;
+      // console.log("adding " + id2);
+      ids.push(id2);
     }
 
     return this.each(function(){
-      id = timeout(settings);
+      timeout(settings);
       $(this).bind(settings.events, function(e){
-        id = resetTimeout(id, settings);
+        resetTimeout(settings);
       });
     }); 
 

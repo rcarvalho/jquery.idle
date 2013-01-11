@@ -66,6 +66,7 @@ $(document).idle({
 ##Options
 
 ```
+onPreIdle     # callback function that gets triggered when preIdle timeout is met
 onIdle	    	# callback function that will be triggered when the user gets idle
 onActive    	[ default function(){} ] # callback function that will be triggered when the user gets active
 events			[ default = mousemove keypress mousedonw ] # events that will reset the idle time
@@ -74,6 +75,10 @@ keepTracking 	[ default = true ] # if you want to keep tracking user idleness, s
 ```
 
 ##Changelog
+
+###1.1.1
+--------
+* Added preIdle callback and timeout
 
 ###1.1.0
 --------
